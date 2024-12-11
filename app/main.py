@@ -6,7 +6,7 @@ from app.database import SessionLocall, engine
 
 models.Base.metadata.create_all(bind=engine)
 
-mini_lib = FastAPI()
+mini_market = FastAPI()
 
 def get_db():
     db = SessionLocall()
@@ -15,36 +15,23 @@ def get_db():
     finally:
         db.close
         
-@mini_lib.post("/create_writer/", response_model=schemas.WriterCreate)
-def add_writer(writer: schemas.WriterCreate, db: Session = Depends(get_db)):
-    create_writer = crud.get_writer_by_name(db=db, writer_name=writer.name)
-    if create_writer is None:
-        raise HTTPException(status_code=400, detail="Writer already exists")
-    return crud.create_writer(db=db, writer=writer)
+@mini_market.post("/add_book/", response_model=schemas.BookCreate)
+def add_book(create_book: schemas.BookCreate, db: Session = Depends(get_db)):
+    get_book = crud.get_book_by_title(db=db, title=create_book.title)
+    if get_book:
+        raise HTTPException(status_code=400, detail="Book already exists")
+    return crud.add_book(db=db, book=create_book)
 
-@mini_lib.get("/get_writer/name/{writer_name}", response_model=schemas.Writer)
-def get_writer_by_name(name: str, db: Session = Depends(get_db)):
-    get_writer = crud.get_writer_by_name(db=db, writer_name=name)
-    if get_writer is None:
-        raise HTTPException(status_code=400, detaili="Writer not found")
-    return get_writer
-
-@mini_lib.get("/get_writer/id/{writer_id}", response_model=schemas.Writer)
-def get_writer_by_id(writer_id: int, db: Session = Depends(get_db)):
-    get_writer = crud.get_writer_by_id(db=db, id=writer_id)
-    if get_writer is None:
-        raise HTTPException(status_code=404, detail="Writer not found")
-    return get_writer
-
-@mini_lib.get("/get_writer/pseudonym/{writer_pseudonym}", response_model=schemas.Writer)
-def get_writer_by_pseudonym(writer_pseudonym: str, db: Session = Depends(get_db)):
-    get_writer = crud.get_writer_by_pseudonym(db=db, pseudo=writer_pseudonym)
-    if get_writer is None:
-        raise HTTPException(status_code=404, detail="Writer not found")
-    return get_writer
-
-@mini_lib.get("/get_writers/", response_model=schemas.Writer)
-def get_writers(skip: int = 0, limit: int = 20, db: Session = Depends(get_db)):
-    get_writers = crud.get_writers(db=db, skip=skip, limit=limit)
-    return get_writers
-
+@mini_market.get("/get_book/id/{book_id}", response_model=schemas.Book)
+def get_book_by_id(book_id: int, db: Session = Depends(get_db)):
+    db_book = crud.get_book_by_id(db=db, id=book_id)
+    if db_book is None:
+        raise HTTPException(status_code=404, detail="Book not found")
+    return db_book
+    
+@mini_market.get("/get_book/title/{book_title}", response_model=schemas.Book)
+def get_boot_by_title(book_title: str, db: Session = Depends(get_db)):
+    db_book = crud.get_book_by_title(db=db, title=book_title)
+    if db_book is None:
+        raise HTTPException(status_code=404, detail="Book not found")
+    return db_book
