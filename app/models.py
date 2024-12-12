@@ -8,7 +8,7 @@ class Book(Base):
     title = Column(String, index=True)
     description = Column(String, nullable=True)
     author = Column(String, index=True)
-    genre = Column(String)
+    genre = Column(String, index=True)
     price = Column(Float, index=True)
     in_stock = Column(Boolean, index=True, default=False)
     numerosity = Column(Integer)

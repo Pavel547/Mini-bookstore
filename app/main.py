@@ -1,4 +1,4 @@
-from fastapi import FastAPI, Depends, HTTPException
+from fastapi import FastAPI, Depends, HTTPException, Query
 from sqlalchemy.orm import Session
 
 from app import crud, models, schemas
@@ -35,3 +35,53 @@ def get_boot_by_title(book_title: str, db: Session = Depends(get_db)):
     if db_book is None:
         raise HTTPException(status_code=404, detail="Book not found")
     return db_book
+
+@mini_market.get("/get_books/books_ganre/{books_ganre}", response_model=list[schemas.Book])
+def get_books_by_genre(books_genre: str, db: Session = Depends(get_db)):
+    db_book = crud.get_book_by_ganre(db=db, genre=books_genre)
+    if db_book is None:
+        raise HTTPException(status_code=404, detail="Books not found")
+    return db_book
+
+@mini_market.get("/get_books/above_price/{books_price}", response_model=list[schemas.Book])
+def get_books_above_price(book_price: float, db: Session = Depends(get_db)):
+    db_book = crud.get_books_above_price(db=db, price=book_price)
+    if db_book is None:
+        raise HTTPException(status_code=404, detail="Books not found")
+    return db_book
+
+@mini_market.get("/get_books/cheaper_price/{books_price}", response_model=list[schemas.Book])
+def get_books_cheaper_price(book_price: float, db: Session = Depends(get_db)):
+    db_book = crud.get_books_cheaper_price(db=db, price=book_price)
+    if db_book is None:
+        raise HTTPException(status_code=404, detail="Books not found")
+    return db_book
+
+@mini_market.get("/get_books/by_price/{price}", response_model=list[schemas.Book])
+def get_book_by_price(order_price: str = Query("asc", enum=["asc", "desc"]), db: Session = Depends(get_db),):
+    db_book = crud.get_books_by_price(order=order_price, db=db)
+    if db_book is None:
+        raise HTTPException(status_code=404, detail="Books not found")
+    return db_book
+
+@mini_market.patch("/update_books/update_numerosity/{books_title}", response_model=schemas.BookUpdate)
+def update_book_date(book_title: str, numerosity: int, db: Session = Depends(get_db)):
+    get_book = crud.get_book_by_title(db=db, title=book_title)
+    if get_book is None: 
+        raise HTTPException(status_code=404, detail="Book not found")
+    return crud.update_book_info_numerosity(db=db, book_title=book_title, update_data=numerosity)
+
+@mini_market.patch("/update_books/update_instock/{books_title}", response_model=schemas.BookUpdate)
+def update_book_date(book_title: str, in_stock: bool, db: Session = Depends(get_db)):
+    get_book = crud.get_book_by_title(db=db, title=book_title)
+    if get_book is None: 
+        raise HTTPException(status_code=404, detail="Book not found")
+    return crud.update_book_info_instock(db=db, book_title=book_title, update_data=in_stock)
+
+@mini_market.delete("/delet_book/{book_title}")
+def delet_book(book_title: str, db: Session = Depends(get_db)):
+    get_book = db.query(models.Book).filter(models.Book.title == book_title).first()
+    if get_book is None:
+        raise HTTPException(status_code=404, detail="Book not found")
+    crud.dell_book(db=db, book=get_book)
+    return "Book was deleted succsessfully"
