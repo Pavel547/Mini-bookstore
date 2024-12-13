@@ -37,20 +37,20 @@ def get_books_by_price(order: str, db: Session):
     else:
         return db.query(models.Book).order_by(desc(models.Book.price)).all()
     
-def update_book_info_numerosity(db: Session, book_title: str, update_data: schemas.BookUpdate):
-    books = db.query(models.Book).filter(models.Book.title == book_title).first()
-    books.numerosity = update_data
+def update_book_instock(db: Session, title: str, update_book: schemas.BookUpdate):
+    book = db.query(models.Book).filter(models.Book.title == title).first()
+    book.in_stock = update_book
     db.commit()
-    db.refresh(books)
-    return books
+    db.refresh(book)
+    return book
 
-def update_book_info_instock(db: Session, book_title: str, update_data: schemas.BookUpdate):
-    books = db.query(models.Book).filter(models.Book.title == book_title).first()
-    books.in_stock = update_data
+def update_book_numerosity(db: Session, title: str, update_book: schemas.BookUpdate):
+    book = db.query(models.Book).filter(models.Book.title == title).first()
+    book.numerosity = update_book
     db.commit()
-    db.refresh(books)
-    return books
-
+    db.refresh(book)
+    return book
+    
 
 def dell_book(db: Session, book: schemas.Book):
     db.delete(book)

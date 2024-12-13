@@ -64,19 +64,19 @@ def get_book_by_price(order_price: str = Query("asc", enum=["asc", "desc"]), db:
         raise HTTPException(status_code=404, detail="Books not found")
     return db_book
 
-@mini_market.patch("/update_books/update_numerosity/{books_title}", response_model=schemas.BookUpdate)
-def update_book_date(book_title: str, numerosity: int, db: Session = Depends(get_db)):
-    get_book = crud.get_book_by_title(db=db, title=book_title)
-    if get_book is None: 
+@mini_market.patch("/update_book_instock/{book_title}", response_model=schemas.BookUpdate)
+def update_book_instock(in_stock: bool, book_title: str, db: Session = Depends(get_db)):
+    db_book = crud.get_book_by_title(db=db, title=book_title)
+    if db_book is None:
         raise HTTPException(status_code=404, detail="Book not found")
-    return crud.update_book_info_numerosity(db=db, book_title=book_title, update_data=numerosity)
+    return crud.update_book_instock(db=db, title=book_title, update_book=in_stock)
 
-@mini_market.patch("/update_books/update_instock/{books_title}", response_model=schemas.BookUpdate)
-def update_book_date(book_title: str, in_stock: bool, db: Session = Depends(get_db)):
-    get_book = crud.get_book_by_title(db=db, title=book_title)
-    if get_book is None: 
+@mini_market.patch("/update_book_numerosity/{book_title}", response_model=schemas.BookUpdate)
+def update_book_numerosity(numerosity: int, book_title: str, db: Session = Depends(get_db)):
+    db_book = crud.get_book_by_title(db=db, title=book_title)
+    if db_book is None:
         raise HTTPException(status_code=404, detail="Book not found")
-    return crud.update_book_info_instock(db=db, book_title=book_title, update_data=in_stock)
+    return crud.update_book_numerosity(db=db, title=book_title, update_book=numerosity)
 
 @mini_market.delete("/delet_book/{book_title}")
 def delet_book(book_title: str, db: Session = Depends(get_db)):

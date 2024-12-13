@@ -14,8 +14,7 @@ class Book(BookBase):
     id: int
     in_stock: bool | None = None
     numerosity: int | None = None
- 
- 
+
 class BookUpdate(BookBase):
     in_stock: bool | None = None
     numerosity: int | None = None
